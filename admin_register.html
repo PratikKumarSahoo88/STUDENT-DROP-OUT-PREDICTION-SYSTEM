@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Registration | Dropout Prediction System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { 
+            /* Matches the pink/orange gradient from your screenshot */
+            background: linear-gradient(135deg, #e94b7c 0%, #f6a154 100%); 
+            min-height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-family: 'Segoe UI', sans-serif; 
+        }
+        .card { 
+            border-radius: 20px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
+            padding: 40px; 
+            max-width: 450px; 
+            width: 100%; 
+            border: none; 
+            background-color: white;
+        }
+        .btn-register { 
+            background-color: #dc3545; 
+            border: none; 
+            border-radius: 15px; 
+            padding: 12px; 
+            font-weight: bold; 
+            width: 100%; 
+            color: white;
+            transition: transform 0.2s;
+        }
+        .btn-register:hover { 
+            transform: translateY(-2px); 
+            background-color: #c82333; 
+            color: white; 
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h3 class="text-center mb-4 fw-bold text-danger">📝 Admin Registration</h3>
+        
+        {% if error %} 
+        <div class="alert alert-danger small text-center fw-bold">{{ error }}</div> 
+        {% endif %}
+        
+        <form method="POST" action="/admin_register">
+            <div class="mb-3">
+                <label class="form-label small fw-bold">Full Name</label>
+                <input type="text" name="name" class="form-control" placeholder="e.g. Dr. Rajesh Kumar" required>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label small fw-bold">Faculty ID</label>
+                <input type="text" name="faculty_id" class="form-control" placeholder="e.g. FAC2026" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label small fw-bold">Department</label>
+                <select name="dept" class="form-select" required>
+                    <option value="" disabled selected>Select Branch...</option>
+                    <option value="CSE">Computer Science & Engg (CSE)</option>
+                    <option value="IT">Information Technology (IT)</option>
+                    <option value="ECE">Electronics & Comm Engg (ECE)</option>
+                    <option value="EE">Electrical Engineering (EE)</option>
+                    <option value="EEE">Electrical & Electronics Engg (EEE)</option>
+                    <option value="MECH">Mechanical Engineering (MECH)</option>
+                    <option value="CIVIL">Civil Engineering (CIVIL)</option>
+                    <option value="MCA">Master of Computer Applications (MCA)</option>
+                    <option value="MBA">Master of Business Administration (MBA)</option>
+                </select>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label small fw-bold">Create Password</label>
+                <input type="password" name="password" class="form-control" placeholder="Create a secure password" required>
+            </div>
+            
+            <div class="mb-4 p-3 bg-light rounded border border-danger">
+                <label class="form-label small fw-bold text-danger">College Authorization Code 🔒</label>
+                <input type="password" name="auth_code" class="form-control border-danger shadow-sm" placeholder="Enter HOD Secret Key" required>
+                <div class="form-text small text-muted mt-1">Only authorized faculty are provided with this secure access code.</div>
+            </div>
+            
+            <button type="submit" class="btn btn-register mb-3">Register Account</button>
+        </form>
+        
+        <div class="text-center border-top pt-3 mt-2">
+            <span class="small text-muted">Already registered?</span><br>
+            <a href="/admin_login" class="btn btn-outline-secondary btn-sm mt-2 rounded-pill px-4">Go to Login</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
