@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: linear-gradient(-45deg, #23a6d5, #23d5ab); min-height: 100vh; display: flex; align-items: center; justify-content: center; font-family: 'Segoe UI', sans-serif;}
+        .card { border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 100%; max-width: 450px; padding: 40px; background: white;}
+    </style>
+</head>
+<body>
+    <div class="card text-center">
+        <h2 class="fw-bold text-primary mb-3">👨‍🎓 Student Access</h2>
+        <p class="text-muted mb-4">Enter your Roll Number and Branch to view your dashboard.</p>
+        
+        <form action="/student_auth" method="POST">
+            <input type="text" name="roll_no" class="form-control form-control-lg mb-3" placeholder="e.g. 2301206104" required>
+            
+            <select name="dept" class="form-select form-select-lg mb-4" required>
+                <option value="" selected disabled>Select Branch...</option>
+                <option value="CSE">Computer Science Engineering (CSE)</option>
+                <option value="IT">Information Technology (IT)</option>
+                <option value="AI&DS">Artificial Intelligence & Data Science (AI&DS)</option>
+                <option value="ECE">Electronics & Communication (ECE)</option>
+                <option value="EEE">Electrical & Electronics (EEE)</option>
+                <option value="MECH">Mechanical Engineering (MECH)</option>
+                <option value="CIVIL">Civil Engineering (CIVIL)</option>
+                <option value="BIOTECH">Biotechnology (BIOTECH)</option>
+                <option value="MCA">Master of Computer Applications (MCA)</option>
+                <option value="MBA">Master of Business Administration (MBA)</option>
+            </select>
+            
+            <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill fw-bold">View Dashboard ➔</button>
+        </form>
+        
+        <a href="/" class="text-muted mt-4 d-block small text-decoration-none">🔙 Back to Home</a>
+    </div>
+</body>
+</html>
