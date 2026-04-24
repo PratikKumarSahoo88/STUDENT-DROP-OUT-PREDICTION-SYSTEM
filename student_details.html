@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Student Profile | Dropout Prediction System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex; align-items: center; justify-content: center;
+        }
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .glass-card { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37); color: white; width: 100%; max-width: 500px; }
+        .form-control, .form-select { background: rgba(255, 255, 255, 0.9); border: none; border-radius: 10px; padding: 12px; }
+        .btn-next { background: linear-gradient(45deg, #FF512F 0%, #DD2476 100%); border: none; border-radius: 50px; padding: 12px; font-weight: bold; width: 100%; color: white; transition: transform 0.2s; }
+        .btn-next:hover { transform: scale(1.05); }
+    </style>
+</head>
+<body>
+
+<div class="glass-card p-5 animate__animated animate__zoomIn">
+    <div class="text-center mb-4">
+        <h2 class="fw-bold">👤 Student Profile</h2>
+        <p class="text-white-50">Admin Input Step 1: Personal Details</p>
+    </div>
+
+    <form action="/academic_input" method="POST">
+        <div class="mb-3">
+            <label class="form-label fw-bold">Full Name</label>
+            <input type="text" name="name" class="form-control" placeholder="e.g. Rahul Sharma" required>
+        </div>
+        
+        <div class="mb-3">
+            <label class="form-label fw-bold">Roll Number</label>
+            <input type="text" name="roll_no" class="form-control" placeholder="e.g. 2301206104" required>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label fw-bold">Department</label>
+            <select name="dept" class="form-select" required>
+                <option value="" selected disabled>Select Branch...</option>
+                <option value="CSE">Computer Science Engineering (CSE)</option>
+                <option value="IT">Information Technology (IT)</option>
+                <option value="AI&DS">Artificial Intelligence & Data Science (AI&DS)</option>
+                <option value="ECE">Electronics & Communication (ECE)</option>
+                <option value="EEE">Electrical & Electronics (EEE)</option>
+                <option value="MECH">Mechanical Engineering (MECH)</option>
+                <option value="CIVIL">Civil Engineering (CIVIL)</option>
+                <option value="BIOTECH">Biotechnology (BIOTECH)</option>
+                <option value="MCA">Master of Computer Applications (MCA)</option>
+                <option value="MBA">Master of Business Administration (MBA)</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-next">Next: Academic Metrics ➝</button>
+        
+        <div class="text-center mt-3">
+            <a href="/admin" class="text-white text-decoration-none small opacity-75">🔙 Cancel / Back to List</a>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>
