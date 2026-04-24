@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard | Dropout Prediction System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body { background-color: #f0f2f5; font-family: 'Segoe UI', sans-serif; }
+        .navbar { background: linear-gradient(90deg, #11998e 0%, #38ef7d 100%); }
+        
+        .stat-card {
+            border-radius: 20px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease; 
+            background: white; overflow: hidden; cursor: pointer;
+        }
+        .stat-card:hover { transform: translateY(-10px); box-shadow: 0 15px 40px rgba(0,0,0,0.15); }
+        
+        .advice-item { padding: 15px; margin-bottom: 10px; border-radius: 12px; background: #fff; border-left: 6px solid #ddd; }
+        .advice-item.critical { border-left-color: #dc3545; background: #fff5f5; }
+        .advice-item.warning { border-left-color: #ffc107; background: #fffbf0; }
+        .advice-item.success { border-left-color: #28a745; background: #f0fff4; }
+
+        .modal-header { background: #f8f9fa; border-bottom: none; }
+        .math-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #eee; }
+        .math-total { border-top: 2px solid #333; font-weight: bold; margin-top: 10px; padding-top: 10px; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark px-4 mb-4 shadow-sm">
+    <span class="navbar-brand mb-0 h1 fw-bold">🚀 Dropout Prediction System</span>
+    
+    {% if is_admin %}
+        <a href="/admin" class="btn btn-light btn-sm rounded-pill px-3 fw-bold text-primary">🔙 Back to Admin List</a>
+    {% else %}
+        <a href="/" class="btn btn-danger btn-sm rounded-pill px-3 fw-bold">🚪 Logout</a>
+    {% endif %}
+</nav>
+
+<div class="container pb-5">
+    <h3 class="mb-4 fw-bold text-secondary">Dashboard for {{ name }}</h3>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-3 animate__animated animate__fadeInUp" style="animation-delay: 0.1s;">
+            <div class="card stat-card text-white {{ color }} h-100" data-bs-toggle="modal" data-bs-target="#riskModal">
+                <div class="card-body text-center d-flex flex-column justify-content-center">
+                    <h5 class="opacity-75 text-uppercase small">Risk Status ℹ️</h5>
+                    <h2 class="fw-bold">{{ status }}</h2>
+                    <div class="badge bg-light text-dark rounded-pill mt-2">Prob: {{ risk_score }}%</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
+            <div class="card stat-card h-100 border-start border-primary border-5" data-bs-toggle="modal" data-bs-target="#gradeModal">
+                <div class="card-body text-center d-flex flex-column justify-content-center">
+                    <h5 class="text-primary text-uppercase small">Predicted Grade ℹ️</h5>
+                    <h2 class="display-4 fw-bold text-dark">{{ grade }} <span style="font-size: 1.2rem;">/ 10</span></h2>
+                    <small class="text-muted">Click to see calculation</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 animate__animated animate__fadeInUp" style="animation-delay: 0.3s;">
+            <div class="card stat-card h-100 border-start border-info border-5" data-bs-toggle="modal" data-bs-target="#cgpaModal">
+                <div class="card-body text-center d-flex flex-column justify-content-center">
+                    <h5 class="text-info text-uppercase small">Current CGPA ℹ️</h5>
+                    <h2 class="display-4 fw-bold text-dark">{{ cgpa }}</h2>
+                    <small class="text-muted">History based</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 animate__animated animate__fadeInUp" style="animation-delay: 0.4s;">
+            <div class="card stat-card h-100 border-start {% if backlogs > 0 %}border-danger{% else %}border-success{% endif %} border-5" data-bs-toggle="modal" data-bs-target="#backlogModal">
+                <div class="card-body text-center d-flex flex-column justify-content-center">
+                    <h5 class="{% if backlogs > 0 %}text-danger{% else %}text-success{% endif %} text-uppercase small">Backlogs ℹ️</h5>
+                    <h2 class="display-4 fw-bold text-dark">{{ backlogs }}</h2>
+                    <small class="text-muted">Click for impact</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4 animate__animated animate__fadeInUp" style="animation-delay: 0.5s;">
+        <div class="col-12">
+            <div class="card stat-card p-4">
+                <h4 class="mb-3 text-secondary fw-bold">🤖 Role-Tailored AI Diagnosis</h4>
+                <div>
+                    {% for advice in advice_list %}
+                        <div class="advice-item {% if 'URGENT' in advice or 'CRITICAL' in advice or 'Risk' in advice %}critical{% elif 'Warning' in advice or 'Monitor' in advice or 'Alert' in advice %}warning{% else %}success{% endif %}">
+                            {{ advice|safe }}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row animate__animated animate__fadeInUp" style="animation-delay: 0.7s;">
+        <div class="col-md-6 mb-3">
+            <div class="card stat-card p-4 h-100">
+                <h5 class="mb-4 text-secondary fw-bold">📉 SGPA Trajectory</h5>
+                <canvas id="sgpaChart"></canvas>
+            </div>
+        </div>
+        <div class="col-md-6 mb-3">
+            <div class="card stat-card p-4 h-100">
+                <h5 class="mb-4 text-secondary fw-bold">📊 Performance Breakdown</h5>
+                <canvas id="performanceChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="riskModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">⚠️ Risk Analysis Logic</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>The AI calculates risk based on two main factors:</p>
+                <ul>
+                    <li><b>Dropout Probability:</b> {{ risk_score }}%</li>
+                    <li><b>Threshold:</b> >50% is High Risk.</li>
+                </ul>
+                <div class="alert alert-info small">
+                    <b>Why?</b> The Random Forest Classifier detected patterns in your profile that match past students who struggled.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="gradeModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">📊 CGPA Prediction Logic (Out of 10)</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted small">How the AI scaled your metrics to a {{ grade }} / 10 CGPA:</p>
+                <div class="math-row"><span>Attendance Impact</span><span class="text-success">+ {{ bd.att_contrib }}</span></div>
+                <div class="math-row"><span>Assignments Impact</span><span class="text-success">+ {{ bd.assign_contrib }}</span></div>
+                <div class="math-row"><span>Surprise Tests Impact</span><span class="text-success">+ {{ bd.st_contrib }}</span></div>
+                <div class="math-row"><span>Class Tests Impact</span><span class="text-success">+ {{ bd.ct_contrib }}</span></div>
+                <div class="math-row"><span>Historical CGPA Boost</span><span class="text-primary">+ {{ bd.cgpa_contrib }}</span></div>
+                <div class="math-row text-danger"><span>Backlog Penalty (-0.5 per backlog)</span><span>- {{ bd.backlog_penalty }}</span></div>
+                <div class="math-row math-total"><span>Final Predicted Grade</span><span>≈ {{ grade }} / 10</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="cgpaModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">📈 Academic History</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-sm">
+                    <thead><tr><th>Semester</th><th>SGPA</th></tr></thead>
+                    <tbody>
+                        {% for sgpa in sgpa_history %}
+                        <tr><td>Sem {{ loop.index }}</td><td>{{ sgpa }}</td></tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot class="table-light"><tr><th>Average CGPA</th><th>{{ cgpa }}</th></tr></tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="backlogModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">⛔ Backlog Impact</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <h1 class="display-3 text-danger mb-3">{{ backlogs }}</h1>
+                <p>Active Backlogs</p>
+                <div class="alert alert-danger">
+                    <strong>Impact:</strong> Final predicted grade is reduced by <b>{{ bd.backlog_penalty }}</b> points because of these backlogs.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const ctxSGPA = document.getElementById('sgpaChart').getContext('2d');
+    const sgpaData = {{ sgpa_history }};
+    new Chart(ctxSGPA, {
+        type: 'line',
+        data: {
+            labels: sgpaData.map((_, i) => `Sem ${i + 1}`),
+            datasets: [{ label: 'SGPA', data: sgpaData, borderColor: '#20c997', backgroundColor: 'rgba(32, 201, 151, 0.1)', fill: true, tension: 0.4, borderWidth: 3 }]
+        },
+        options: { scales: { y: { min: 0, max: 10 } }, plugins: { legend: { display: false } } }
+    });
+
+    const ctxPerf = document.getElementById('performanceChart').getContext('2d');
+    new Chart(ctxPerf, {
+        type: 'bar',
+        data: {
+            labels: ['Att', 'Assign', 'ST1', 'ST2', 'CT1', 'CT2', 'QT1', 'QT2'],
+            datasets: [{ 
+                data: [{{ att }}, {{ assign }}, {{ st1 }}, {{ st2 }}, {{ ct1 }}, {{ ct2 }}, {{ qt1 }}, {{ qt2 }}], 
+                backgroundColor: ['#4e73df', '#f6c23e', '#e74a3b', '#ff6b6b', '#36b9cc', '#1cc88a', '#858796', '#5a5c69'], 
+                borderRadius: 6 
+            }]
+        },
+        options: { scales: { y: { beginAtZero: true, max: 100 } }, plugins: { legend: { display: false } } }
+    });
+</script>
+</body>
+</html>
