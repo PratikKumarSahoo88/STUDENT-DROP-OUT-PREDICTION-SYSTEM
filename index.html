@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dropout Prediction System | Metrics</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <style>
+        :root { --primary-gradient: linear-gradient(45deg, #FF512F 0%, #DD2476 100%); }
+        body {
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%; animation: gradientBG 15s ease infinite;
+            min-height: 100vh; font-family: 'Segoe UI', sans-serif; padding: 20px;
+        }
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37); color: white;
+        }
+        .form-section {
+            background: rgba(255, 255, 255, 0.9); border-radius: 15px; padding: 20px;
+            margin-bottom: 20px; color: #333; border-left: 5px solid #DD2476;
+            transition: transform 0.3s ease;
+        }
+        .form-section:hover { transform: translateY(-5px); }
+        .btn-predict {
+            background: var(--primary-gradient); border: none; border-radius: 50px;
+            padding: 15px; font-weight: bold; font-size: 1.2rem; color: white;
+            box-shadow: 0 10px 20px rgba(221, 36, 118, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container d-flex justify-content-center align-items-center">
+        <div class="glass-card p-5 animate__animated animate__fadeInUp" style="width: 100%; max-width: 800px;">
+            <div class="text-center mb-5">
+                <h1 class="display-4 fw-bold">🎓 Dropout Prediction System</h1>
+                <p class="lead">Admin Input Step 2: Academic Metrics for <b>{{ name }}</b> ({{ roll_no }})</p>
+            </div>
+
+            <form action="/predict" method="POST">
+                <input type="hidden" name="name" value="{{ name }}">
+                <input type="hidden" name="roll_no" value="{{ roll_no }}">
+                <input type="hidden" name="dept" value="{{ dept }}">
+
+                <div class="form-section animate__animated animate__fadeInLeft">
+                    <h5>📚 Academic History</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Current Semester</label>
+                            <select id="currentSem" name="current_sem" class="form-select" onchange="generateSgpaInputs()" required>
+                                <option value="" disabled selected>Select...</option>
+                                <option value="2">Semester 2</option>
+                                <option value="3">Semester 3</option>
+                                <option value="4">Semester 4</option>
+                                <option value="5">Semester 5</option>
+                                <option value="6">Semester 6</option>
+                                <option value="7">Semester 7</option>
+                                <option value="8">Semester 8</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Active Backlogs</label>
+                            <input type="number" name="backlogs" class="form-control" placeholder="0" min="0" required>
+                        </div>
+                    </div>
+                    <div id="sgpaContainer" class="row g-2 mt-2"></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-section">
+                            <h5>📅 Attendance</h5>
+                            <div class="row g-2">
+                                <div class="col-6"><input type="number" name="total_classes" class="form-control" placeholder="Total" required></div>
+                                <div class="col-6"><input type="number" name="attended_classes" class="form-control" placeholder="Attended" required></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-section">
+                            <h5>📝 Assignments</h5>
+                            <div class="row g-2">
+                                <div class="col-6"><input type="number" name="total_assign" class="form-control" placeholder="Total" required></div>
+                                <div class="col-6"><input type="number" name="submitted_assign" class="form-control" placeholder="Done" required></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-section">
+                            <h5>⚡ Surprise Tests</h5>
+                            <div class="row mb-2">
+                                <div class="col-6"><input type="number" name="st1_total" class="form-control" placeholder="ST1 Total" required></div>
+                                <div class="col-6"><input type="number" name="st1_score" class="form-control" placeholder="ST1 Score" required></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6"><input type="number" name="st2_total" class="form-control" placeholder="ST2 Total" required></div>
+                                <div class="col-6"><input type="number" name="st2_score" class="form-control" placeholder="ST2 Score" required></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-section">
+                            <h5>📖 Class Tests</h5>
+                            <div class="row mb-2">
+                                <div class="col-6"><input type="number" name="ct1_total" class="form-control" placeholder="CT1 Total" required></div>
+                                <div class="col-6"><input type="number" name="ct1_score" class="form-control" placeholder="CT1 Score" required></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6"><input type="number" name="ct2_total" class="form-control" placeholder="CT2 Total" required></div>
+                                <div class="col-6"><input type="number" name="ct2_score" class="form-control" placeholder="CT2 Score" required></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-section">
+                            <h5>❓ Quiz Tests</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="row mb-2">
+                                        <div class="col-6"><input type="number" name="qt1_total" class="form-control" placeholder="QT1 Total" required></div>
+                                        <div class="col-6"><input type="number" name="qt1_score" class="form-control" placeholder="QT1 Score" required></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="row mb-2">
+                                        <div class="col-6"><input type="number" name="qt2_total" class="form-control" placeholder="QT2 Total" required></div>
+                                        <div class="col-6"><input type="number" name="qt2_score" class="form-control" placeholder="QT2 Score" required></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-predict w-100 mt-3">Analyze & Generate Dashboard</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function generateSgpaInputs() {
+            const sem = parseInt(document.getElementById('currentSem').value);
+            const container = document.getElementById('sgpaContainer');
+            container.innerHTML = '<label class="form-label w-100 small text-muted">Previous Sem SGPAs:</label>';
+            for (let i = 1; i < sem; i++) {
+                const div = document.createElement('div');
+                div.className = 'col-3 animate__animated animate__zoomIn';
+                div.innerHTML = `<input type="number" step="0.01" name="sgpa_${i}" class="form-control" placeholder="Sem ${i}" min="0" max="10" required>`;
+                container.appendChild(div);
+            }
+        }
+    </script>
+</body>
+</html>
